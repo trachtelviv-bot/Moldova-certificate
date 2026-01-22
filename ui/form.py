@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+#from generator import generate_document
 #from collect import collect_form_data
 # from generator import generate_document
 # from tkinter import messagebox

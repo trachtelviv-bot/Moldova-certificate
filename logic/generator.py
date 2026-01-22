@@ -3,6 +3,7 @@ from docx.shared import Cm
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
+
 ROWS_MAIN = 17
 ROWS_SECOND = 5
 COLS = 20
@@ -31,7 +32,10 @@ def add_field(run, field):
 # =====================================================
 # MAIN GENERATOR
 # =====================================================
-def generate_document(output_file: str):
+def generate_document(output_file: str, data: dict):
+    
+    print("DATA FROM FORM:", data)
+
     doc = Document()
     section = doc.sections[0]
 
@@ -44,7 +48,21 @@ def generate_document(output_file: str):
     table1 = doc.add_table(rows=ROWS_MAIN, cols=COLS)
     table1.style = "Table Grid"
     table1.autofit = False
+    
+# ================== TEST DATA ==================
+    # Серія + номер
+    table1.cell(0, 0).text = f"Сертифікат: {data.get('series', '')} {data.get('cert_num', '')}"
+    
+    # Дані особи
+    table1.cell(4, 1).text = f"{data.get('last_name', '')} {data.get('first_name', '')}"
+    table1.cell(5, 1).text = data.get('home_address', '')
+    table1.cell(5, 5).text = data.get('phone', '')
+    
+    # Географія
+    table1.cell(6, 1).text = data.get('entry_country', '')
+    table1.cell(7, 1).text = data.get('dest_country', '')
 
+    
     MERGES_TABLE_1 = [
         (0, 0, 0, 19),
         (1, 0, 7, 0),
