@@ -2,6 +2,9 @@ from docx import Document
 from docx.shared import Cm
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from logic.mapping import TABLE1_MERGES, TABLE1_FIELDS
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt
 
 
 ROWS_MAIN = 17
@@ -28,12 +31,34 @@ def add_field(run, field):
 
     run._r.extend([fld_begin, instr, fld_end])
 
+#------------------------------------------------------
+# helper
+
+def apply_style(cell, text, style: dict | None = None):
+    cell.text = ""
+    p = cell.paragraphs[0]
+    run = p.add_run(text)
+
+    if not style:
+        return
+
+    if style.get("align") == "center":
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    font = run.font
+    if "font" in style:
+        font.name = style["font"]
+    if "size" in style:
+        font.size = Pt(style["size"])
+    if "bold" in style:
+        font.bold = style["bold"]
+
 
 # =====================================================
 # MAIN GENERATOR
 # =====================================================
 def generate_document(output_file: str, data: dict):
-    
+
     print("DATA FROM FORM:", data)
 
     doc = Document()
@@ -48,21 +73,30 @@ def generate_document(output_file: str, data: dict):
     table1 = doc.add_table(rows=ROWS_MAIN, cols=COLS)
     table1.style = "Table Grid"
     table1.autofit = False
-    
-# ================== TEST DATA ==================
-    # Серія + номер
-    table1.cell(0, 0).text = f"Сертифікат: {data.get('series', '')} {data.get('cert_num', '')}"
-    
-    # Дані особи
-    table1.cell(4, 1).text = f"{data.get('last_name', '')} {data.get('first_name', '')}"
-    table1.cell(5, 1).text = data.get('home_address', '')
-    table1.cell(5, 5).text = data.get('phone', '')
-    
-    # Географія
-    table1.cell(6, 1).text = data.get('entry_country', '')
-    table1.cell(7, 1).text = data.get('dest_country', '')
 
+    # ---- MERGES TABLE 1 ----
+    for m in TABLE1_MERGES:
+        merge_cells(table1, *m)
     
+    # ---- FILL TABLE 1 FROM MAPPING ----
+    for field in TABLE1_FIELDS:
+    row = field["row"]
+    col = field["col"]
+    cell = table1.cell(row, col)
+
+    if "text" in field:
+        text = field["text"]
+
+    elif "format" in field:
+        text = field["format"].format(**data)
+
+    else:
+        text = data.get(field["key"], "")
+
+    apply_style(cell, text, field.get("style"))
+
+
+    # ---- MERGES TABLE 1 ----
     MERGES_TABLE_1 = [
         (0, 0, 0, 19),
         (1, 0, 7, 0),
@@ -134,4 +168,3 @@ def generate_document(output_file: str, data: dict):
     add_field(r, "NUMPAGES")
 
     doc.save(output_file)
-
