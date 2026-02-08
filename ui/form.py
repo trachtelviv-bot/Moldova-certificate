@@ -246,3 +246,128 @@ def create_main_tab(notebook):
         .pack(anchor="e", padx=10, pady=15)
 
     return tab, vars_dict
+
+# =====================================================
+# CARGO TAB
+# =====================================================
+def create_cargo_tab(notebook):
+    tab = ttk.Frame(notebook)
+
+    vars_dict = {
+        # Перевезення
+        "transport_num": tk.StringVar(),
+        "checkpoint": tk.StringVar(),
+        "goods_description": tk.StringVar(),
+        "goods_code": tk.StringVar(),
+        "animal_count": tk.StringVar(),
+
+        # Ідентифікація тварин
+        "animal_species": tk.StringVar(),
+        "identification_system": tk.StringVar(),
+        "chip_number": tk.StringVar(),
+
+        # Заповнити за необхідності
+        "cites_num": tk.StringVar(),
+        "package_count": tk.StringVar(),
+        "package_type": tk.StringVar(),
+        "seal_number": tk.StringVar(),
+    }
+
+    # ---------- Scroll ----------
+    canvas = tk.Canvas(tab, highlightthickness=0)
+    scrollbar = ttk.Scrollbar(tab, orient="vertical", command=canvas.yview)
+    scrollable_frame = ttk.Frame(canvas)
+
+    scrollable_frame.bind(
+        "<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+    )
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+
+    # =================================================
+    # Перевезення
+    # =================================================
+    frame_transport = ttk.LabelFrame(scrollable_frame, text=" Перевезення ", padding=10)
+    frame_transport.pack(fill="x", padx=10, pady=5)
+
+    ttk.Label(frame_transport, text="Номер транспорту").grid(row=0, column=0, sticky="w")
+    ttk.Entry(frame_transport, textvariable=vars_dict["transport_num"], width=20).grid(row=0, column=1, padx=10)
+
+    ttk.Label(frame_transport, text="Пункт переходу").grid(row=1, column=0, sticky="w")
+    cb_checkpoint = ttk.Combobox(frame_transport, textvariable=vars_dict["checkpoint"], width=42)
+    cb_checkpoint.grid(row=1, column=1, padx=10)
+    # setup_autocomplete(cb_checkpoint, CHECKPOINTS_LIST)
+
+    ttk.Label(frame_transport, text="Опис товару").grid(row=2, column=0, sticky="w")
+    ttk.Entry(frame_transport, textvariable=vars_dict["goods_description"], width=45).grid(row=2, column=1, padx=10)
+
+    ttk.Label(frame_transport, text="Код товару").grid(row=3, column=0, sticky="w")
+    cb_goods_code = ttk.Combobox(frame_transport, textvariable=vars_dict["goods_code"], width=42)
+    cb_goods_code.grid(row=3, column=1, padx=10)
+    # setup_autocomplete(cb_goods_code, GOODS_CODE_LIST)
+
+    ttk.Label(frame_transport, text="Кількість тварин").grid(row=4, column=0, sticky="w")
+    cb_animal_count = ttk.Combobox(frame_transport, textvariable=vars_dict["animal_count"], width=10)
+    cb_animal_count.grid(row=4, column=1, sticky="w", padx=10)
+    # setup_autocomplete(cb_animal_count, ANIMAL_COUNT_LIST)
+
+    # =================================================
+    # Ідентифікація тварин
+    # =================================================
+    frame_id = ttk.LabelFrame(scrollable_frame, text=" Ідентифікація тварин ", padding=10)
+    frame_id.pack(fill="x", padx=10, pady=5)
+
+    ttk.Label(frame_id, text="Вид (наукова назва)").grid(row=0, column=0, sticky="w")
+    cb_species = ttk.Combobox(frame_id, textvariable=vars_dict["animal_species"], width=42)
+    cb_species.grid(row=0, column=1, padx=10)
+    # setup_autocomplete(cb_species, SPECIES_LIST)
+
+    ttk.Label(frame_id, text="С-ма ідентифікації").grid(row=1, column=0, sticky="w")
+    cb_id_system = ttk.Combobox(frame_id, textvariable=vars_dict["identification_system"], width=42)
+    cb_id_system.grid(row=1, column=1, padx=10)
+    # setup_autocomplete(cb_id_system, ID_SYSTEM_LIST)
+
+    ttk.Label(frame_id, text="№ чіпа і т.п.").grid(row=2, column=0, sticky="w")
+    ttk.Entry(frame_id, textvariable=vars_dict["chip_number"], width=30).grid(row=2, column=1, padx=10)
+
+
+    # =================================================
+    # Заповнити за необхідності
+    # =================================================
+    frame_optional = ttk.LabelFrame(scrollable_frame, text=" Заповнити за необхідності ", padding=10)
+    frame_optional.pack(fill="x", padx=10, pady=5)
+
+    ttk.Label(frame_optional, text="№ CITES").grid(row=0, column=0, sticky="w")
+    ttk.Entry(frame_optional, textvariable=vars_dict["cites_num"], width=20).grid(row=0, column=1, padx=10)
+
+    ttk.Label(frame_optional, text="К-ть упаковок (кліток)").grid(row=1, column=0, sticky="w")
+    ttk.Entry(frame_optional, textvariable=vars_dict["package_count"], width=10).grid(row=1, column=1, sticky="w", padx=10)
+
+    ttk.Label(frame_optional, text="Тип упаковки (клітка тощо)").grid(row=2, column=0, sticky="w")
+    ttk.Entry(frame_optional, textvariable=vars_dict["package_type"], width=30).grid(row=2, column=1, padx=10)
+
+    ttk.Label(frame_optional, text="Номер пломби (якщо опломбовано)").grid(row=3, column=0, sticky="w")
+    ttk.Entry(frame_optional, textvariable=vars_dict["seal_number"], width=30).grid(row=3, column=1, padx=10)
+
+    # =================================================
+    # BUTTON
+    # =================================================
+    def on_generate():
+        from logic.collect import collect_form_data
+        from logic.generator import generate_document
+        from tkinter import messagebox
+
+        data = collect_form_data(vars_dict)
+        os.makedirs("templates", exist_ok=True)
+        output = os.path.join("templates", "test_certificate.docx")
+        generate_document(output, data)
+        messagebox.showinfo("Готово", f"Документ створено:\n{output}")
+
+    ttk.Button(scrollable_frame, text="Згенерувати документ", command=on_generate)\
+        .pack(anchor="e", padx=10, pady=15)
+
+    return tab, vars_dict
+
