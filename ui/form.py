@@ -271,6 +271,14 @@ def create_cargo_tab(notebook):
         "package_count": tk.StringVar(),
         "package_type": tk.StringVar(),
         "seal_number": tk.StringVar(),
+        # ІІ.3
+        "ii3_mode": tk.StringVar(value="birds"),
+        "cb_isolated": tk.BooleanVar(value=True),
+        "cb_vaccinated": tk.BooleanVar(value=False),
+        "cb_tested": tk.BooleanVar(value=False),
+        "cb_household": tk.BooleanVar(value=True),
+        "cb_origin_isolated_or_vacc": tk.BooleanVar(value=True),
+
     }
 
     # ---------- Scroll ----------
@@ -351,6 +359,57 @@ def create_cargo_tab(notebook):
 
     ttk.Label(frame_optional, text="Номер пломби (якщо опломбовано)").grid(row=3, column=0, sticky="w")
     ttk.Entry(frame_optional, textvariable=vars_dict["seal_number"], width=30).grid(row=3, column=1, padx=10)
+
+    # =================================================
+    # ІІ.3 Умови
+    # =================================================
+    frame_ii3 = ttk.LabelFrame(scrollable_frame, text=" ІІ.3 Умови ", padding=10)
+    frame_ii3.pack(fill="x", padx=10, pady=5)
+
+    cb1 = ttk.Checkbutton(frame_ii3,
+                          text="Ізольовані 30 днів",
+                          variable=vars_dict["cb_isolated"])
+    cb1.pack(anchor="w")
+
+    cb2 = ttk.Checkbutton(frame_ii3,
+                          text="Вакциновані (H5/H7)",
+                          variable=vars_dict["cb_vaccinated"])
+    cb2.pack(anchor="w")
+
+    cb3 = ttk.Checkbutton(frame_ii3,
+                          text="Пройшли тест (H5/H7)",
+                          variable=vars_dict["cb_tested"])
+    cb3.pack(anchor="w")
+
+    cb4 = ttk.Checkbutton(frame_ii3,
+                          text="До домогосподарства 30 днів",
+                          variable=vars_dict["cb_household"])
+    cb4.pack(anchor="w")
+
+    cb5 = ttk.Checkbutton(frame_ii3,
+                          text="Ізольовані або вакциновані",
+                          variable=vars_dict["cb_origin_isolated_or_vacc"])
+    cb5.pack(anchor="w")
+
+    def toggle_checkboxes():
+        state = "normal" if vars_dict["ii3_mode"].get() == "birds" else "disabled"
+        for cb in (cb1, cb2, cb3, cb4, cb5):
+            cb.configure(state=state)
+
+    ttk.Radiobutton(frame_ii3,
+                    text="ІІ.3 Птахи",
+                    variable=vars_dict["ii3_mode"],
+                    value="birds",
+                    command=toggle_checkboxes).pack(anchor="w")
+
+    ttk.Radiobutton(frame_ii3,
+                    text="ІІ.3 Карантинний центр",
+                    variable=vars_dict["ii3_mode"],
+                    value="quarantine",
+                    command=toggle_checkboxes).pack(anchor="w")
+
+    toggle_checkboxes()
+
 
     # =================================================
     # BUTTON
