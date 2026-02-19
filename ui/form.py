@@ -252,19 +252,19 @@ def create_main_tab(notebook):
     # =================================================
     # BUTTON
     # =================================================
-    def on_generate():
-        from logic.collect import collect_form_data
-        from logic.generator import generate_document
-        from tkinter import messagebox
+    # def on_generate():
+        # from logic.collect import collect_form_data
+        # from logic.generator import generate_document
+        # from tkinter import messagebox
 
-        data = collect_form_data(vars_dict)
-        os.makedirs("templates", exist_ok=True)
-        output = os.path.join("templates", "test_certificate.docx")
-        generate_document(output, data)
-        messagebox.showinfo("Готово", f"Документ створено:\n{output}")
+        # data = collect_form_data(vars_dict)
+        # os.makedirs("templates", exist_ok=True)
+        # output = os.path.join("templates", "test_certificate.docx")
+        # generate_document(output, data)
+        # messagebox.showinfo("Готово", f"Документ створено:\n{output}")
 
-    ttk.Button(scrollable_frame, text="Згенерувати документ", command=on_generate)\
-        .pack(anchor="e", padx=10, pady=15)
+    # ttk.Button(scrollable_frame, text="Згенерувати документ", command=on_generate)\
+        # .pack(anchor="e", padx=10, pady=15)
 
     return tab, vars_dict
 
@@ -430,30 +430,30 @@ def create_cargo_tab(notebook):
                     command=toggle_checkboxes).pack(anchor="w")
 
     toggle_checkboxes()
+# #------------------------------19.02.2026
+    # # =================================================
+    # # BUTTON
+    # # =================================================
+    # def on_generate():
+        # from logic.collect import collect_form_data
+        # from logic.generator import generate_document
+        # from tkinter import messagebox
 
+        # data = collect_form_data(vars_dict)
+        # os.makedirs("templates", exist_ok=True)
+        # output = os.path.join("templates", "test_certificate.docx")
+        # generate_document(output, data)
+        # messagebox.showinfo("Готово", f"Документ створено:\n{output}")
 
-    # =================================================
-    # BUTTON
-    # =================================================
-    def on_generate():
-        from logic.collect import collect_form_data
-        from logic.generator import generate_document
-        from tkinter import messagebox
-
-        data = collect_form_data(vars_dict)
-        os.makedirs("templates", exist_ok=True)
-        output = os.path.join("templates", "test_certificate.docx")
-        generate_document(output, data)
-        messagebox.showinfo("Готово", f"Документ створено:\n{output}")
-
-    ttk.Button(scrollable_frame, text="Згенерувати документ", command=on_generate)\
-        .pack(anchor="e", padx=10, pady=15)
+    # ttk.Button(scrollable_frame, text="Згенерувати документ", command=on_generate)\
+        # .pack(anchor="e", padx=10, pady=15)
 
     return tab, vars_dict
+
 # =====================================================
 # VETCONTROL TAB
 # =====================================================
-def create_vetcontrol_tab(notebook):
+def create_vetcontrol_tab(notebook, generate_callback=None):
 
     tab = ttk.Frame(notebook)
 
@@ -506,5 +506,34 @@ def create_vetcontrol_tab(notebook):
     ttk.Label(frame_vet, text="Підрозділ ВетКонтроль").grid(row=2, column=0, sticky="w")
     ttk.Entry(frame_vet, textvariable=vars_dict["vet_department"], width=50).grid(row=2, column=1, padx=10)
 
+    # =================================================
+    # BUTTON
+    # =================================================
+    if generate_callback:
+        ttk.Button(
+            tab,
+            text="Згенерувати документ",
+            command=generate_callback
+        ).pack(anchor="e", padx=15, pady=20)
+
+
     return tab, vars_dict
+    # =================================================
+    # BUTTON
+    # =================================================
+    # def on_generate():
+        # from logic.collect import collect_form_data
+        # from logic.generator import generate_document
+        # from tkinter import messagebox
+
+        # data = collect_form_data(vars_dict)
+        # os.makedirs("templates", exist_ok=True)
+        # output = os.path.join("templates", "test_certificate.docx")
+        # generate_document(output, data)
+        # messagebox.showinfo("Готово", f"Документ створено:\n{output}")
+
+    # ttk.Button(scrollable_frame, text="Згенерувати документ", command=on_generate)\
+        # .pack(anchor="e", padx=10, pady=15)
+
+    # return tab, vars_dict
 
