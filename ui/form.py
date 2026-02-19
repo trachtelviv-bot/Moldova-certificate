@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 import os
+import json
+
+CONFIG_FILE = "vetcontrol_config.json"
 
 # =====================================================
 # COUNTRIES
@@ -67,6 +70,24 @@ def autofill_on_focusout(source_var: tk.StringVar, entry_widget: tk.Entry):
             entry_widget.delete(0, tk.END)
             entry_widget.insert(0, source_var.get())
     entry_widget.bind("<FocusOut>", handler)
+
+
+# =====================================================
+# CONFIG SAVE / LOAD
+# =====================================================
+def load_vetcontrol_config():
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_vetcontrol_config(data: dict):
+    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
 
 # =====================================================
 # MAIN TAB
@@ -427,6 +448,63 @@ def create_cargo_tab(notebook):
 
     ttk.Button(scrollable_frame, text="Згенерувати документ", command=on_generate)\
         .pack(anchor="e", padx=10, pady=15)
+
+    return tab, vars_dict
+# =====================================================
+# VETCONTROL TAB
+# =====================================================
+def create_vetcontrol_tab(notebook):
+
+    tab = ttk.Frame(notebook)
+
+    vars_dict = {
+        "pik_department": tk.StringVar(),
+        "pik_address": tk.StringVar(),
+        "official_person": tk.StringVar(),
+
+        "vet_login": tk.StringVar(),
+        "vet_password": tk.StringVar(),
+        "vet_department": tk.StringVar(),
+    }
+
+    # ---------- Завантаження з файлу ----------
+    saved_data = load_vetcontrol_config()
+    for key in vars_dict:
+        if key in saved_data:
+            vars_dict[key].set(saved_data[key])
+
+    main_frame = ttk.Frame(tab, padding=15)
+    main_frame.pack(fill="both", expand=True)
+
+    # =================================================
+    # Реквізити сертифікату
+    # =================================================
+    frame_cert = ttk.LabelFrame(main_frame, text=" Реквізити сертифікату ", padding=10)
+    frame_cert.pack(fill="x", pady=10)
+
+    ttk.Label(frame_cert, text="Відділ ПІК").grid(row=0, column=0, sticky="w")
+    ttk.Entry(frame_cert, textvariable=vars_dict["pik_department"], width=50).grid(row=0, column=1, padx=10)
+
+    ttk.Label(frame_cert, text="Адреса").grid(row=1, column=0, sticky="w")
+    ttk.Entry(frame_cert, textvariable=vars_dict["pik_address"], width=50).grid(row=1, column=1, padx=10)
+
+    ttk.Label(frame_cert, text="Службова особа").grid(row=2, column=0, sticky="w")
+    ttk.Entry(frame_cert, textvariable=vars_dict["official_person"], width=50).grid(row=2, column=1, padx=10)
+
+    # =================================================
+    # ВетКонтроль
+    # =================================================
+    frame_vet = ttk.LabelFrame(main_frame, text=" ВетКонтроль ", padding=10)
+    frame_vet.pack(fill="x", pady=10)
+
+    ttk.Label(frame_vet, text="Логін ВетКонтролю").grid(row=0, column=0, sticky="w")
+    ttk.Entry(frame_vet, textvariable=vars_dict["vet_login"], width=40).grid(row=0, column=1, padx=10)
+
+    ttk.Label(frame_vet, text="Пароль ВетКонтролю").grid(row=1, column=0, sticky="w")
+    ttk.Entry(frame_vet, textvariable=vars_dict["vet_password"], show="*", width=40).grid(row=1, column=1, padx=10)
+
+    ttk.Label(frame_vet, text="Підрозділ ВетКонтроль").grid(row=2, column=0, sticky="w")
+    ttk.Entry(frame_vet, textvariable=vars_dict["vet_department"], width=50).grid(row=2, column=1, padx=10)
 
     return tab, vars_dict
 
